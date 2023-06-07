@@ -53,10 +53,10 @@ class User
         return $response;
     }
 
-    public function showUserRole($user_id)
+    public function showUserRoles($userId)
     {
-        $sql = "select * from user_role where user_id = ? ";
-        $response = DB::select($sql, [$user_id]);
+        $sql = "select * from user_role where user_id = :userId ";
+        $response = DB::select($sql, ['user_id'=> $userId]);
         return $response;
     }
 }

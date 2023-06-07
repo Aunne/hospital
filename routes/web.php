@@ -16,3 +16,13 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+$router->post('/addDepartment', [
+    'middleware' => ['Admin'],
+    'uses' => 'Admin@addDepartment'
+]);
+
+$router->post('/addDivision', [
+    'middleware' => ['Admin'],
+    'uses' => 'Admin@addDivision'
+]);

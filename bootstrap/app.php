@@ -79,7 +79,7 @@ $app->middleware([
 ]);
 
 $app->routeMiddleware([
-    'auth' => App\Http\Middleware\Authenticate::class,
+    'Admin' => App\Http\Middleware\Admin::class,
 ]);
 
 /*

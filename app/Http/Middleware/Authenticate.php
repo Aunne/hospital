@@ -8,7 +8,6 @@ use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
 use Exception;
 use App\Models\User as UserModel;
-use PhpParser\Node\Stmt\Return_;
 
 class Authenticate
 {
@@ -126,12 +125,12 @@ class Authenticate
                 if (empty($phoneNumber))
                     $phoneNumber = null;
 
-                $userID = $this->userModel->getUseraccount($account)[0]->id;
-                if ($userID == 0)
-                    return response("資料庫未知錯誤", 400);
-                if ($this->userModel->newUserInfo($userID, $name, $phoneNumber) == 0)
+                $user = $this->userModel->getUserAccount($account);
+                if ($user == 0)
+                    return response("資料庫查詢錯誤", 400);
+                if ($this->userModel->newUserInfo($user[0]->id, $name, $phoneNumber) == 0)
                     return response("使用者資訊新增失敗", 400);
-                if ($this->userModel->newUserRole($userID) == 0)
+                if ($this->userModel->newUserRole($user[0]->id) == 0)
                     return response("使用者Role新增失敗", 400);
 
                 return response('新增成功', 200);

@@ -26,3 +26,14 @@ $router->post('/addDivision', [
     'middleware' => ['Admin'],
     'uses' => 'Admin@addDivision'
 ]);
+
+$router->post('/addShift', [
+    'middleware' => ['Admin'],
+    'uses' => 'Admin@addShift'
+]);
+
+$router->post('/addDoctor', [
+    'middleware' => ['Admin'],
+    'uses' => 'Admin@addDoctor'
+]);
+

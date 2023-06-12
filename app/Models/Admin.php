@@ -28,7 +28,25 @@ class Admin
     public function addDivision($divisionName, $departmentID)
     {
         $sql = "insert into division ( divisionName, departmentID) values ( :divisionName, :departmentID)";
-        $response = DB::insert($sql, ['divisionName' => $divisionName, 'departmentID'=> $departmentID]);
+        $response = DB::insert($sql, ['divisionName' => $divisionName, 'departmentID' => $departmentID]);
+        return $response;
+    }
+
+    public function getShiftAllParameter($doctorID, $divisionID, $date, $timePeriod)
+    {
+        $sql = "select * from shift 
+                where doctorID	 = :doctorID 
+                AND divisionID = :divisionID
+                AND date = :date
+                AND timePeriod = :timePeriod";
+        $response = DB::select($sql, ['doctorID' => $doctorID, 'divisionID' => $divisionID, 'date' => $date, 'timePeriod' => $timePeriod]);
+        return $response;
+    }
+
+    public function addShift($doctorID, $divisionID, $date, $timePeriod)
+    {
+        $sql = "insert into shift ( doctorID, divisionID, date, timePeriod) values ( :doctorID, :divisionID, :date, :timePeriod)";
+        $response = DB::insert($sql, ['doctorID' => $doctorID, 'divisionID' => $divisionID, 'date' => $date, 'timePeriod' => $timePeriod]);
         return $response;
     }
 }

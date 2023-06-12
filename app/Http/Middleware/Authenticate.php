@@ -162,7 +162,7 @@ class Authenticate
         $issuer_claim = "http://rainbowHospital.org.tw";
         $audience_claim = "http://rainbowHospital.org.tw";
         $issuedat_claim = time(); // issued at
-        $expire_claim = $issuedat_claim + 6000;
+        $expire_claim = $issuedat_claim + 60000;
         $payload = array(
             "iss" => $issuer_claim,
             "aud" => $audience_claim,

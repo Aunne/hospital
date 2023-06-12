@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use Closure;
 use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
-use Exception;
 use App\Models\Role as RoleModel;
 
 class Admin

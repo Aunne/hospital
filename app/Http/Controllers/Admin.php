@@ -82,7 +82,7 @@ class Admin extends Controller
 
     public function addShift(Request $request)
     {
-        $res = $this->empty_check(['divisionName', 'doctorIDNumber', 'data', 'timePeriod'], $request);
+        $res = $this->empty_check(['divisionName', 'doctorIDNumber', 'date', 'timePeriod'], $request);
         if ($res['status'])
             return response($res['message'], 400);
 

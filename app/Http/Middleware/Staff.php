@@ -7,7 +7,7 @@ use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
 use App\Models\Role as RoleModel;
 
-class Admin
+class Staff
 {
     /**
      * Handle an incoming request.
@@ -17,8 +17,7 @@ class Admin
      * @return mixed
      */
     protected $roleModel;
-
-
+    
     public function __construct()
     {
         $this->roleModel = new roleModel();

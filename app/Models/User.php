@@ -56,7 +56,7 @@ class User
     public function showUserRoles($userId)
     {
         $sql = "select * from user_role where user_id = :userId ";
-        $response = DB::select($sql, ['user_id'=> $userId]);
+        $response = DB::select($sql, ['user_id' => $userId]);
         return $response;
     }
 }

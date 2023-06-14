@@ -37,3 +37,12 @@ $router->post('/addDoctor', [
     'uses' => 'Admin@addDoctor'
 ]);
 
+$router->post('/userAddAppointment', [
+    'middleware' => ['User'],
+    'uses' => 'User@userAddAppointment'
+]);
+
+$router->post('/staffAddAppointment', [
+    'middleware' => ['Staff'],
+    'uses' => 'Staff@staffAddAppointment'
+]);

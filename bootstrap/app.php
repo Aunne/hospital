@@ -79,9 +79,7 @@ $app->middleware([
 ]);
 
 $app->routeMiddleware([
-    'Admin' => App\Http\Middleware\Admin::class,
-    'Staff' => App\Http\Middleware\Staff::class,
-    'User' => App\Http\Middleware\User::class
+    'RolePermission' => App\Http\Middleware\RolePermission::class,
 ]);
 
 /*

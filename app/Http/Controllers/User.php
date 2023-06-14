@@ -36,12 +36,10 @@ class User extends Controller
         return response(json_encode($response), $response['status']);
     }
 
-
     public function newUser(Request $request)
     {
         $acccount = $request->input("acccount");
         $password = $request->input("password");
-
 
         if ($this->usermodel->newUser($acccount, $password) == 1) {
             $response['status'] = 200;
@@ -52,7 +50,6 @@ class User extends Controller
         }
 
         return response(json_encode($response), $response['status']);
-
     }
 
     public function updateUser(Request $request)
@@ -76,6 +73,50 @@ class User extends Controller
         return response(json_encode($response), $response['status']);
     }
 
+    public function userCancelAppointment(Request $request)
+    {
+        $res = $this->empty_check(['shiftID'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+
+        $shiftID = $request->input('shiftID');
+        $jwt = (array) JWT::decode($request->header('jwtToken'), new Key('YOUR_SECRET_KEY', 'HS256'));
+        $userID = $jwt['data']->id;
+        $today = date('Y-m-d');
+        $appointmnet = $this->appointmentmodel->getValidAppointmentUserIDShiftID($userID, $shiftID);
+
+        if (count($appointmnet) == 0)
+            return response('查無此掛號', 404);
+
+        if ($appointmnet[0]->date <= $today)
+            return response("不能取消當日或過往的掛號", 403);
+
+        if ($this->appointmentmodel->cancelAppointment($userID, $shiftID) == 0)
+            return response("取消失敗", 400);
+
+        return response("取消成功", 200);
+    }
+
+    public function userGetValidAppointmentUserID(Request $request)
+    {
+        $jwt = (array) JWT::decode($request->header('jwtToken'), new Key('YOUR_SECRET_KEY', 'HS256'));
+        $userID = $jwt['data']->id;
+
+        $appointment = $this->appointmentmodel->getValidAppointmentUserID($userID);
+        if ($appointment == 0)
+            return response("查詢失敗", 400);
+
+        $response['result'] = $appointment;
+        if (count($response['result']) != 0) {
+            $response['status'] = 200;
+            $response['message'] = '查詢成功';
+        } else {
+            $response['status'] = 204;
+            $response['message'] = '無查詢結果';
+        }
+        return response(json_encode($response), $response['status']);
+    }
+
     public function userAddAppointment(Request $request)
     {
         $res = $this->empty_check(['shiftID'], $request);
@@ -95,7 +136,7 @@ class User extends Controller
         if ($today >= $shift[0]->date)
             return response('掛號日期錯誤，', 400);
 
-        $appointment = $this->appointmentmodel->getAppointment($shiftID);
+        $appointment = $this->appointmentmodel->getAppointmentShiftID($shiftID);
         if (count($appointment) >= 50)
             return response("額滿不可掛號", 202);
 
@@ -155,5 +196,4 @@ class User extends Controller
 
         return false;
     }
-
 }

@@ -43,7 +43,10 @@ class Authenticate
     {
         switch ($request->path()) {
             case 'userLogin':
-                //查詢DB驗證帳密的正確性 
+                $res = $this->empty_check(['account', 'password'], $request);
+                if ($res['status'])
+                    return response($res['message'], 400);
+                
                 $account = $request->input('account');
                 $password = $request->input('password');
 
@@ -63,7 +66,10 @@ class Authenticate
                 }
 
             case 'staffLogin':
-                //查詢DB驗證帳密的正確性 
+                $res = $this->empty_check(['account', 'password'], $request);
+                if ($res['status'])
+                    return response($res['message'], 400);
+
                 $account = $request->input('account');
                 $password = $request->input('password');
 
@@ -83,7 +89,10 @@ class Authenticate
                 }
 
             case 'adminLogin':
-                //查詢DB驗證帳密的正確性 
+                $res = $this->empty_check(['account', 'password'], $request);
+                if ($res['status'])
+                    return response($res['message'], 400);
+
                 $account = $request->input('account');
                 $password = $request->input('password');
 
@@ -103,7 +112,10 @@ class Authenticate
                 }
 
             case 'newUser':
-                //註冊帳號
+                $res = $this->empty_check(['account', 'password'], $request);
+                if ($res['status'])
+                    return response($res['message'], 400);
+                    
                 $account = $request->input("account");
                 $password = $request->input("password");
                 $name = $request->input("name");
@@ -114,16 +126,14 @@ class Authenticate
 
                 if (count($this->userModel->getUseraccount($account)) == 1)
                     return response('帳號重複', 202);
-                if (empty($password) || empty($account))
-                    return response("帳號或密碼不可為空", 400);
 
                 $res = $this->userModel->newUser($account, $password);
                 if ($res == 0)
                     return response("帳號新增失敗", 400);
                 if (empty($name))
-                    $name = null;
+                    $name = NAN;
                 if (empty($phoneNumber))
-                    $phoneNumber = null;
+                    $phoneNumber = NAN;
 
                 $user = $this->userModel->getUserAccount($account);
                 if ($user == 0)
@@ -277,5 +287,20 @@ class Authenticate
                 return true;
         }
         return false;
+    }
+
+    public function empty_check($key, $request)
+    {
+        for ($i = 0; $i < count($key); $i++) {
+            if (empty($request->input($key[$i]))) {
+                $res['message'] = $key[$i] . " 不能為空";
+                $res['status'] = true;
+                return $res;
+            }
+        }
+
+        $res['message'] = "OK";
+        $res['status'] = false;
+        return $res;
     }
 }

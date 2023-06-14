@@ -18,31 +18,47 @@ $router->get('/', function () use ($router) {
 });
 
 $router->post('/addDepartment', [
-    'middleware' => ['Admin'],
+    'middleware' => ['RolePermission'],
     'uses' => 'Admin@addDepartment'
 ]);
 
 $router->post('/addDivision', [
-    'middleware' => ['Admin'],
+    'middleware' => ['RolePermission'],
     'uses' => 'Admin@addDivision'
 ]);
 
 $router->post('/addShift', [
-    'middleware' => ['Admin'],
+    'middleware' => ['RolePermission'],
     'uses' => 'Admin@addShift'
 ]);
 
 $router->post('/addDoctor', [
-    'middleware' => ['Admin'],
+    'middleware' => ['RolePermission'],
     'uses' => 'Admin@addDoctor'
 ]);
 
 $router->post('/userAddAppointment', [
-    'middleware' => ['User'],
+    'middleware' => ['RolePermission'],
     'uses' => 'User@userAddAppointment'
 ]);
 
 $router->post('/staffAddAppointment', [
-    'middleware' => ['Staff'],
+    'middleware' => ['RolePermission'],
     'uses' => 'Staff@staffAddAppointment'
 ]);
+
+$router->post('/addUser', [
+    'middleware' => ['RolePermission'],
+    'uses' => 'Staff@addUser'
+]);
+
+$router->get('/userGetValidAppointmentUserID', [
+    'middleware' => ['RolePermission'],
+    'uses' => 'User@userGetValidAppointmentUserID'
+]);
+
+$router->patch('/userCancelAppointment', [
+    'middleware' => ['RolePermission'],
+    'uses' => 'User@userCancelAppointment'
+]);
+

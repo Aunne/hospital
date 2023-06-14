@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Staff as StaffModel;
 use App\Models\Appointment as AppointmentModel;
 use App\Models\shift as ShiftModel;
-use App\Models\User as UserModel;
+use App\Models\User as usermodel;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
@@ -21,7 +21,42 @@ class Staff extends Controller
         $this->staffmodel = new StaffModel();
         $this->appointmentmodel = new AppointmentModel();
         $this->shiftmodel = new ShiftModel();
-        $this->usermodel = new UserModel();
+        $this->usermodel = new usermodel();
+    }
+
+    public function addUser(Request $request)
+    {
+        $res = $this->empty_check(['account', 'password'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+
+        $account = $request->input("account");
+        $password = $request->input("password");
+        $name = $request->input("name");
+        $phoneNumber = $request->input("phoneNumber");
+
+        if (!$this->id_card($account))
+            return response("證件格式錯誤", 400);
+        if (count($this->usermodel->getUseraccount($account)) == 1)
+            return response('帳號重複', 202);
+
+        $res = $this->usermodel->newUser($account, $password);
+        if ($res == 0)
+            return response("帳號新增失敗", 400);
+        if (empty($name))
+            $name = NAN;
+        if (empty($phoneNumber))
+            $phoneNumber = NAN;
+
+        $user = $this->usermodel->getUserAccount($account);
+        if ($user == 0)
+            return response("資料庫查詢錯誤", 400);
+        if ($this->usermodel->newUserInfo($user[0]->id, $name, $phoneNumber) == 0)
+            return response("使用者資訊新增失敗", 400);
+        if ($this->usermodel->newUserRole($user[0]->id) == 0)
+            return response("使用者Role新增失敗", 400);
+
+        return response('新增成功', 200);
     }
 
     public function staffAddAppointment(Request $request)
@@ -29,18 +64,18 @@ class Staff extends Controller
         $res = $this->empty_check(['shiftID', 'IdNumber'], $request);
         if ($res['status'])
             return response($res['message'], 400);
-        
+
         $IdNumber = $request->input('IdNumber');
         $shiftID = $request->input('shiftID');
         $today = date('Y-m-d');
 
-        if(!$this->id_card($IdNumber))
-            return response("錯誤的身分證字號",400);
-        
+        if (!$this->id_card($IdNumber))
+            return response("錯誤的身分證字號", 400);
+
         $user = $this->usermodel->getUserAccount($IdNumber);
-        if(count($user)==0)
-            return response("病患不存在",404);
-        
+        if (count($user) == 0)
+            return response("病患不存在", 404);
+
         $shift = $this->shiftmodel->getShift($shiftID);
         if (count($shift) == 0)
             return response("無此班表", 400);
@@ -48,7 +83,7 @@ class Staff extends Controller
         if ($today >= $shift[0]->date)
             return response('掛號日期錯誤，', 400);
 
-        $appointment = $this->appointmentmodel->getAppointment($shiftID);
+        $appointment = $this->appointmentmodel->getAppointmentShiftID($shiftID);
         if (count($appointment) >= 50)
             return response("額滿不可掛號", 202);
 

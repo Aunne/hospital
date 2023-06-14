@@ -7,7 +7,7 @@ use \Firebase\JWT\JWT;
 use \Firebase\JWT\Key;
 use App\Models\Role as RoleModel;
 
-class Admin
+class RolePermission
 {
     /**
      * Handle an incoming request.

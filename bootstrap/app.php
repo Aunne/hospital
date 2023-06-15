@@ -80,7 +80,7 @@ $app->configure('app');
 //]);
 
 $app->routeMiddleware([
-    'Authenticate' => App\Http\Middleware\Authenticate::class,
+    'LoginAuthenticate' => App\Http\Middleware\Authenticate::class,
     'RolePermission' => App\Http\Middleware\RolePermission::class
 ]);
 

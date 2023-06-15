@@ -8,8 +8,18 @@ class shift
 {
     public function getShift($shiftID)
     {
-        $sql = "select * from shift where shiftID = :shiftID ";
-        $response = DB::select($sql, ['shiftID' => $shiftID]);
+        $todayY = date("Y");
+        $todayM = date("m");
+
+        $sql = "select * 
+        from shift, doctor, division, department
+        where shift.doctorID = doctor.doctorID
+        AND shift.divisionID = division.divisionID 
+        AND division.departmentID = department.departmentID
+        AND year(shift.date) >= :todayY
+        AND month(shift.date) >= :todayM
+        AND shiftID = :shiftID ";
+        $response = DB::select($sql, ['shiftID' => $shiftID, 'todayY' => $todayY, 'todayM' => $todayM]);
         return $response;
     }
 }

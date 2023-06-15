@@ -20,7 +20,7 @@ class User extends Controller
         $this->appointmentmodel = new AppointmentModel();
     }
 
-    public function getUser(Request $request)
+    public function userGetUser(Request $request)
     {
         $jwt = (array) JWT::decode($request->header('jwtToken'), new Key('YOUR_SECRET_KEY', 'HS256'));
         $id = $jwt['data']->id;
@@ -34,6 +34,39 @@ class User extends Controller
             $response['message'] = '無查詢結果';
         }
         return response(json_encode($response), $response['status']);
+    }
+
+    public function getShift(Request $request)
+    {
+        $res = $this->empty_check(['divisionID'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+        
+        $divisionID = $request->input("divisionID");
+        $response['result'] = $this->shiftmodel->getShift($divisionID);
+        if (count($response['result']) != 0) {
+            $response['status'] = 200;
+            $response['message'] = '查詢成功';
+        } else {
+            $response['status'] = 204;
+            $response['message'] = '無查詢結果';
+        }
+
+        return response(json_encode($response), $response['status']);
+    }
+
+    public function getAllDivision()
+    {
+        $response['result'] = $this->usermodel->getAllDivision();
+        if (count($response['result']) != 0) {
+            $response['status'] = 200;
+            $response['message'] = '查詢成功';
+        } else {
+            $response['status'] = 204;
+            $response['message'] = '無查詢結果';
+        }
+        return response(json_encode($response), $response['status']);
+
     }
 
     public function newUser(Request $request)
@@ -72,16 +105,26 @@ class User extends Controller
         return response('新增成功', 200);
     }
 
-    public function updateUser(Request $request)
+    public function userUpdateUser(Request $request)
     {
-        $id = $request->input("id");
-        $acccount = $request->input("acccount");
-        $password = $request->input("password");
+        $jwt = (array) JWT::decode($request->header('jwtToken'), new Key('YOUR_SECRET_KEY', 'HS256'));
+        $id = $jwt['data']->id;
+        $name = $request->input("name");
+        $phoneNumber = $request->input("phoneNumber");
 
-        if ($this->getUser($id) == 0)
+        $user = $this->usermodel->showUser($id);
+        if ($user == 0)
             return response('無此帳號', 404);
 
-        $response['result'] = $this->usermodel->updateUser($id, $acccount, $password);
+        if (empty($name) && empty($phoneNumber))
+            return response('無更新內容', 400);
+
+        if (empty($name))
+            $name = NAN;
+        if (empty($phoneNumber))
+            $phoneNumber = NAN;
+
+        $response['result'] = $this->usermodel->userUpdateUser($id, $name, $phoneNumber);
 
         if ($response['result'] == 1) {
             $response['status'] = 200;

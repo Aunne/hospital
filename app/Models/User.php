@@ -7,16 +7,33 @@ class User
 {
     public function showUser($id)
     {
-        $sql = "select * from user where id = :id ";
+        $sql = "
+        select * 
+        from user, userinfo
+        where user.id = userinfo.userID
+        AND user.id = :id ";
         $response = DB::select($sql, ['id' => $id]);
         return $response;
     }
+
     public function getUserAccount($account)
     {
         $sql = "select * from user where account = :account ";
         $response = DB::select($sql, ['account' => $account]);
         return $response;
     }
+
+    public function getAllDivision()
+    {
+        $sql = "
+        select * 
+        from division, department
+        where division.departmentID = department.departmentID";
+        
+        $response = DB::select($sql);
+        return $response;
+    }
+
     public function newUser($account, $password)
     {
         $sql = "insert into user ( account, password) values ( :account, :password)";
@@ -38,10 +55,16 @@ class User
         return $response;
     }
 
-    public function updateUser($id, $account, $password)
+    public function userUpdateUser($id, $name, $phoneNumber)
     {
-        $sql = "update user set account=:account, password=:password where id=:id";
-        $response = DB::update($sql, ['id' => $id, 'account' => $account, 'password' => $password]);
+        $sql = "update userinfo ";
+        if ($name != NAN) 
+            $sql .= "set userinfo.name = :name ";
+        if ($phoneNumber != NAN) 
+            $sql .= ", userinfo.phoneNumber =:phoneNumber ";
+        
+        $sql .= "where userinfo.userID = :id";
+        $response = DB::update($sql, ['id' => $id, 'name' => $name, 'phoneNumber' => $phoneNumber]);
 
         return $response;
     }

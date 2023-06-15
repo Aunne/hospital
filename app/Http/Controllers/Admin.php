@@ -3,6 +3,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Admin as AdminModel;
 use App\Models\Doctor as DoctorModel;
+use App\Models\User as UserModel;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
@@ -11,12 +12,39 @@ class Admin extends Controller
 {
     protected $adminmodel;
     protected $doctormodel;
+    protected $usermodel;
     public function __construct()
     {
         $this->adminmodel = new AdminModel();
         $this->doctormodel = new DoctorModel();
+        $this->usermodel = new UserModel();
     }
 
+
+    public function adminLogin(Request $request)
+    {
+        $res = $this->empty_check(['account', 'password'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+
+        $account = $request->input('account');
+        $password = $request->input('password');
+
+        if ($this->verify($account, 'admin'))
+            return response("帳號格式錯誤", 400);
+
+        $res = $this->usermodel->getUserAccount($account);
+
+        if (count($res) == 0)
+            return response('無此帳號', 404);
+        if ($password == $res[0]->password) {
+            $id = $res[0]->id;
+            $token = $this->genToken($id, $account);
+            return response($token, 200);
+        } else {
+            return response('密碼錯誤', 400);
+        }
+    }
 
     public function addDepartment(Request $request)
     {
@@ -139,5 +167,35 @@ class Admin extends Controller
         $res['message'] = "OK";
         $res['status'] = false;
         return $res;
+    }
+
+    public function verify($account, $key)
+    {
+        for ($i = 0; $i < strlen($key); $i++) {
+            if ($key[$i] != $account[$i])
+                return true;
+        }
+        return false;
+    }
+
+    private function genToken($id, $account)
+    {
+        $secret_key = "YOUR_SECRET_KEY";
+        $issuer_claim = "http://rainbowHospital.org.tw";
+        $audience_claim = "http://rainbowHospital.org.tw";
+        $issuedat_claim = time(); // issued at
+        $expire_claim = $issuedat_claim + 60000;
+        $payload = array(
+            "iss" => $issuer_claim,
+            "aud" => $audience_claim,
+            "iat" => $issuedat_claim,
+            "exp" => $expire_claim,
+            "data" => array(
+                "id" => $id,
+                "account" => $account
+            )
+        );
+        $jwt = JWT::encode($payload, $secret_key, 'HS256');
+        return $jwt;
     }
 }

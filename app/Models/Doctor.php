@@ -19,10 +19,41 @@ class Doctor
         return $response;
     }
 
+    public function getDoctorID($doctorID)
+    {
+        $sql = "select * from doctor where doctorID = :doctorID ";
+        $response = DB::select($sql, ['doctorID' => $doctorID]);
+        return $response;
+    }
+
+    public function updateDoctor($doctorID, $doctorName, $doctorIDNumber)
+    {
+        $sql = "
+        update doctor set doctorName = :doctorName, doctorIDNumber = :doctorIDNumber 
+        where doctorID = :doctorID";
+        $response = DB::update($sql, ['doctorID' => $doctorID, 'doctorName' => $doctorName, 'doctorIDNumber' => $doctorIDNumber]);
+        return $response;
+
+    }
+
     public function adminGetAllDoctor()
     {
         $sql = "select * from doctor";
         $response = DB::select($sql);
         return $response;
+    }
+
+    public function getShiftDoctorID($doctorID)
+    {
+        $sql = "select * from shift where doctorID = :doctorID ";
+        $response = DB::select($sql, ['doctorID' => $doctorID]);
+        return $response;   
+    }
+
+    public function deleteDoctor($doctorID)
+    {
+        $sql = "delete from doctor where doctorID = :doctorID";
+        $response = DB::delete($sql, ['doctorID' => $doctorID]);
+        return $response;   
     }
 }

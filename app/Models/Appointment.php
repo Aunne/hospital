@@ -80,4 +80,16 @@ class Appointment
 
         return $response;
     }
+
+    public function getAppointmentDivisionID($divisionID)
+    {
+        $sql = "
+        select * 
+        from appointment, shift
+        where appointment.shiftID = shift.shiftID
+        AND shift.divisionID = :divisionID
+        AND appointment.isCancel = 'false'";
+        $response = DB::select($sql, ['divisionID' => $divisionID]);
+        return $response;
+    }
 }

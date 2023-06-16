@@ -12,11 +12,11 @@ class Admin
         return $response;
     }
 
-    public function adminGetAllDepartment() 
+    public function adminGetAllDepartment()
     {
         $sql = "select * from department";
         $response = DB::select($sql);
-        return $response;        
+        return $response;
     }
     public function addDepartment($departmentName)
     {
@@ -32,7 +32,24 @@ class Admin
         return $response;
     }
 
-    public function adminGetAllDivision($departmentID) 
+    public function getDivisionID($divisionID)
+    {
+        $sql = "select * from division where divisionID = :divisionID ";
+        $response = DB::select($sql, ['divisionID' => $divisionID]);
+        return $response;
+    }
+
+    public function updateDivision($divisionID, $divisionName, $departmentID)
+    {
+        $sql = "
+        update division set divisionName = :divisionName, departmentID = :departmentID 
+        where divisionID = :divisionID";
+        $response = DB::update($sql, ['divisionID' => $divisionID, 'divisionName' => $divisionName, 'departmentID' => $departmentID]);
+        return $response;
+    }
+
+
+    public function adminGetAllDivision($departmentID)
     {
         $sql = "select * from division where departmentID = :departmentID";
         $response = DB::select($sql, ['departmentID' => $departmentID]);
@@ -61,6 +78,13 @@ class Admin
     {
         $sql = "insert into shift ( doctorID, divisionID, date, timePeriod) values ( :doctorID, :divisionID, :date, :timePeriod)";
         $response = DB::insert($sql, ['doctorID' => $doctorID, 'divisionID' => $divisionID, 'date' => $date, 'timePeriod' => $timePeriod]);
+        return $response;
+    }
+
+    public function getDivisionDepartmentID($departmentID)  
+    {
+        $sql = "select * from division where departmentID = :departmentID";
+        $response = DB::select($sql, ['departmentID' => $departmentID]);
         return $response;
     }
 }

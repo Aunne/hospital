@@ -1,24 +1,20 @@
 <?php
 namespace App\Http\Controllers;
 
-use App\Models\Staff as StaffModel;
 use App\Models\Appointment as AppointmentModel;
 use App\Models\shift as ShiftModel;
 use App\Models\User as usermodel;
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
 use Illuminate\Http\Request;
 
 class Staff extends Controller
 {
-    protected $staffmodel;
     protected $appointmentmodel;
     protected $shiftmodel;
     protected $usermodel;
 
     public function __construct()
     {
-        $this->staffmodel = new StaffModel();
         $this->appointmentmodel = new AppointmentModel();
         $this->shiftmodel = new ShiftModel();
         $this->usermodel = new usermodel();
@@ -47,6 +43,107 @@ class Staff extends Controller
         } else {
             return response('密碼錯誤', 400);
         }
+    }
+    public function staffGetUserAccount(Request $request)
+    {
+        $res = $this->empty_check(['account'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+
+        $account = $request->input('account');
+        $res = $this->usermodel->staffGetUserAccount($account);
+        if (count($res) == 0)
+            return response('無此帳號', 404);
+        return response(json_encode($res), 200);
+    }
+
+    public function staffUpdateUser(Request $request)
+    {
+        $res = $this->empty_check(['account'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+
+        $account = $request->input('account');
+        $name = $request->input('name');
+        $phoneNumber = $request->input('phoneNumber');
+        if (!$this->id_card($account))
+            return response("證件格式錯誤", 400);
+
+        $user = $this->usermodel->staffGetUserAccount($account);
+        if (count($user) == 0)
+            return response('無此帳號', 404);
+        $userID = $user[0]->id;
+
+        if (empty($name))
+            $name = $user[0]->name;
+        if (empty($phoneNumber))
+            $phoneNumber = $user[0]->phoneNumber;
+
+        if (empty($name) && empty($phoneNumber))
+            return response('無更新內容', 400);
+        if ($user[0]->name == $name && $user[0]->phoneNumber == $phoneNumber)
+            return response('無更新內容', 400);
+
+        $response['result'] = $this->usermodel->userUpdateUser($userID, $name, $phoneNumber);
+        if ($response['result'] == 1) {
+            $response['status'] = 200;
+            $response['message'] = '更新成功';
+        } else {
+            $response['status'] = 202;
+            $response['message'] = '更新失敗';
+        }
+        return response(json_encode($response), $response['status']);
+    }
+
+    public function staffGetUserValidAppointment(Request $request)
+    {
+        $res = $this->empty_check(['account'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+
+        $account = $request->input('account');
+        if (!$this->id_card($account))
+            return response("證件格式錯誤", 400);
+
+        $user = $this->usermodel->staffGetUserAccount($account);
+        if (count($user) == 0)
+            return response('無此帳號', 404);
+
+        $userID = $user[0]->id;
+        $res = $this->appointmentmodel->getValidAppointmentUserID($userID);
+        if (count($res) == 0)
+            return response('無預約紀錄', 404);
+        return response(json_encode($res), 200);
+    }
+
+    public function staffCancelAppointment(Request $request)
+    {
+        $res = $this->empty_check(['shiftID', 'account'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+
+        $account = $request->input('account');
+        $shiftID = $request->input('shiftID');
+
+        if (!$this->id_card($account))
+            return response("證件格式錯誤", 400);
+
+        $user = $this->usermodel->staffGetUserAccount($account);
+
+        $userID = $user[0]->id;
+        $today = date('Y-m-d');
+        $appointmnet = $this->appointmentmodel->getValidAppointmentUserIDShiftID($userID, $shiftID);
+
+        if (count($appointmnet) == 0)
+            return response('查無此掛號', 404);
+
+        if ($appointmnet[0]->date <= $today)
+            return response("不能取消當日或過往的掛號", 403);
+
+        if ($this->appointmentmodel->cancelAppointment($userID, $shiftID) == 0)
+            return response("取消失敗", 400);
+
+        return response("取消成功", 200);
     }
 
     public function addUser(Request $request)

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use App\Models\Admin as AdminModel;
 use App\Models\Doctor as DoctorModel;
 use App\Models\User as UserModel;
+use App\Models\shift as ShiftModel;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Http\Request;
@@ -13,11 +14,13 @@ class Admin extends Controller
     protected $adminmodel;
     protected $doctormodel;
     protected $usermodel;
+    protected $shiftmodel;
     public function __construct()
     {
         $this->adminmodel = new AdminModel();
         $this->doctormodel = new DoctorModel();
         $this->usermodel = new UserModel();
+        $this->shiftmodel = new ShiftModel();
     }
 
 
@@ -63,6 +66,65 @@ class Admin extends Controller
 
         return response("新增成功", 201);
     }
+
+    public function adminGetAllDivision(Request $request)
+    {
+        $res = $this->empty_check(['departmentName'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+
+        $departmentName = $request->input('departmentName');
+
+        $department = $this->adminmodel->getDepartmentName($departmentName);
+        if (count($department) == 0)
+            return response("無此大科別", 400);
+
+        $departmentID = $department[0]->departmentID;
+        $res = $this->adminmodel->adminGetAllDivision($departmentID);
+        if (count($res) == 0)
+            return response("無資料", 404);
+
+        return response(json_encode($res), 200);
+    }
+
+    public function adminGetAllShift(Request $request) 
+    {
+        $res = $this->empty_check([ 'divisionName'], $request);
+        if ($res['status'])
+            return response($res['message'], 400);
+
+        $divisionName = $request->input('divisionName');
+
+        $division = $this->adminmodel->getDivisionName($divisionName);
+        if (count($division) == 0)
+            return response("無此小科別", 400);
+
+        $divisionID = $division[0]->divisionID;
+        $res = $this->shiftmodel->adminGetShiftDivisionID($divisionID);
+        if (count($res) == 0)
+            return response("無資料", 404);
+
+        return response(json_encode($res), 200);
+    }
+
+    public function adminGetAllDepartment()
+    {
+        $res = $this->adminmodel->adminGetAllDepartment();
+        if (count($res) == 0)
+            return response("無資料", 404);
+
+        return response(json_encode($res), 200);
+    }
+
+    public function adminGetAllDoctor()
+    {
+        $res = $this->doctormodel->adminGetAllDoctor();
+        if (count($res) == 0)
+            return response("無資料", 404);
+
+        return response(json_encode($res), 200);
+    }
+
 
     public function addDivision(Request $request)
     {

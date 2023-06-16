@@ -22,4 +22,23 @@ class shift
         $response = DB::select($sql, ['shiftID' => $shiftID, 'todayY' => $todayY, 'todayM' => $todayM]);
         return $response;
     }
+
+    public function adminGetShiftDivisionID($divisionID)
+    {
+        $todayY = date("Y");
+        $todayM = date("m");
+
+        $sql = "
+        select *
+        from shift, doctor, division, department
+        where shift.doctorID = doctor.doctorID
+        AND shift.divisionID = division.divisionID
+        AND division.departmentID = department.departmentID
+        AND year(shift.date) >= :todayY
+        AND month(shift.date) >= :todayM
+        AND shift.divisionID = :divisionID; ";
+
+        $response = DB::select($sql, ['divisionID' => $divisionID, 'todayY' => $todayY, 'todayM' => $todayM]);
+        return $response;
+    }
 }

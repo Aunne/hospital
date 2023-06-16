@@ -17,18 +17,18 @@ $router->get('/', function () use ($router) {
     return $router->app->version();
 });
 
-// 使用者登入 POST 參數: account, password
+// 病患登入 POST 參數: account, password
 $router->post('/userLogin', 'User@userLogin');
-// 使用者註冊 POST 參數: account, password, name, phone ( name, phone 可以為空 )
+// 病患註冊 POST 參數: account, password, name, phone ( name, phone 可以為空 )
 $router->post('/newUser', 'User@newUser');
 // 櫃台登入 POST 參數: account, password
 $router->post('/staffLogin', 'Staff@staffLogin');
 // 管理員登入 POST 參數: account, password
 $router->post('/adminLogin', 'Admin@adminLogin');
 // 取得所有科別 GET 參數: 無
-$router->get('/getAllDivision','User@getAllDivision');
+$router->get('/getAllDivision', 'User@getAllDivision');
 // 取得班表 GET 參數: divisionID
-$router->get('/getShift','User@getShift');
+$router->get('/getShift', 'User@getShift');
 
 // 管理員新增大科別 POST 參數: departmentName
 $router->post('/addDepartment', [
@@ -40,6 +40,12 @@ $router->post('/addDepartment', [
 $router->post('/addDivision', [
     'middleware' => ['RolePermission', 'LoginAuthenticate'],
     'uses' => 'Admin@addDivision'
+]);
+
+// 櫃台取得病患資訊 POST 參數: account
+$router->get('/staffGetUserAccount', [
+    'middleware' => ['RolePermission', 'LoginAuthenticate'],
+    'uses' => 'Staff@staffGetUserAccount'
 ]);
 
 // 管理員新增班別 POST 參數: doctorIDNumber divisionName date timePeriod
@@ -54,7 +60,7 @@ $router->post('/addDoctor', [
     'uses' => 'Admin@addDoctor'
 ]);
 
-// 使用者新增掛號 POST 參數: shiftID
+// 病患新增掛號 POST 參數: shiftID
 $router->post('/userAddAppointment', [
     'middleware' => ['RolePermission', 'LoginAuthenticate'],
     'uses' => 'User@userAddAppointment'
@@ -66,32 +72,75 @@ $router->post('/staffAddAppointment', [
     'uses' => 'Staff@staffAddAppointment'
 ]);
 
-// 櫃台新增使用者 POST 參數: account, password, name, phoneNumber ( name, phoneNumber 可以為空 )
+// 櫃台新增病患 POST 參數: account, password, name, phoneNumber ( name, phoneNumber 可以為空 )
 $router->post('/addUser', [
     'middleware' => ['RolePermission', 'LoginAuthenticate'],
     'uses' => 'Staff@addUser'
 ]);
 
-// 使用者查詢自己有效的掛號 GET 參數: 無
+// 病患查詢自己有效的掛號 GET 參數: 無
 $router->get('/userGetValidAppointmentUserID', [
     'middleware' => ['RolePermission', 'LoginAuthenticate'],
     'uses' => 'User@userGetValidAppointmentUserID'
 ]);
 
-// 使用者取消掛號 PATCH 參數: shiftID
+// 櫃台查詢自己有效的掛號 GET 參數: account
+$router->get('/staffGetUserValidAppointment', [
+    'middleware' => ['RolePermission', 'LoginAuthenticate'],
+    'uses' => 'Staff@staffGetUserValidAppointment'
+]);
+
+// 病患取消掛號 PATCH 參數: shiftID
 $router->patch('/userCancelAppointment', [
     'middleware' => ['RolePermission', 'LoginAuthenticate'],
     'uses' => 'User@userCancelAppointment'
 ]);
 
-// 使用者取得使用者資訊 GET 參數: 無
+// 櫃台取消使掛號 PATCH 參數: account, shiftID
+$router->patch('/staffCancelAppointment', [
+    'middleware' => ['RolePermission', 'LoginAuthenticate'],
+    'uses' => 'Staff@staffCancelAppointment'
+]);
+
+// 病患取得病患資訊 GET 參數: 無
 $router->get('/userGetUser', [
     'middleware' => ['RolePermission', 'LoginAuthenticate'],
     'uses' => 'User@userGetUser'
 ]);
 
-// 使用者更新使用者資訊 PATCH 參數: account, password, name, phoneNumber ( name, phoneNumber 可以為空 )
+// 病患更新病患資訊 PATCH 參數: account, password, name, phoneNumber ( name, phoneNumber 可以為空 )
 $router->patch('/userUpdateUser', [
     'middleware' => ['RolePermission', 'LoginAuthenticate'],
     'uses' => 'User@userUpdateUser'
+]);
+
+// 櫃台修改病患資訊 PATCH 參數: account, name, phoneNumber ( name, phoneNumber 可以為空 )
+$router->patch('/staffUpdateUser', [
+    'middleware' => ['RolePermission', 'LoginAuthenticate'],
+    'uses' => 'Staff@staffUpdateUser'
+]);
+
+
+// 管理員查詢所有大科別 GET 參數: 無
+$router->get('/adminGetAllDepartment', [
+    'middleware' => ['RolePermission', 'LoginAuthenticate'],
+    'uses' => 'Admin@adminGetAllDepartment'
+]);
+
+// 管理員查詢所有小科別 GET 參數: DepartmentName
+$router->get('/adminGetAllDivision', [
+    'middleware' => ['RolePermission', 'LoginAuthenticate'],
+    'uses' => 'Admin@adminGetAllDivision'
+]);
+
+// 管理員查詢所有醫生 GET 參數: 無
+$router->get('/adminGetAllDoctor', [
+    'middleware' => ['RolePermission', 'LoginAuthenticate'],
+    'uses' => 'Admin@adminGetAllDoctor'
+]);
+
+// 管理員依據小科別查詢所有班別 GET 參數: divisionName
+$router->get('/adminGetAllShift', [
+    'middleware' => ['RolePermission', 'LoginAuthenticate'],
+    'uses' => 'Admin@adminGetAllShift'
 ]);

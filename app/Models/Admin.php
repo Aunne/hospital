@@ -11,6 +11,13 @@ class Admin
         $response = DB::select($sql, ['departmentName' => $departmentName]);
         return $response;
     }
+
+    public function adminGetAllDepartment() 
+    {
+        $sql = "select * from department";
+        $response = DB::select($sql);
+        return $response;        
+    }
     public function addDepartment($departmentName)
     {
         $sql = "insert into department ( departmentName) values ( :departmentName)";
@@ -22,6 +29,13 @@ class Admin
     {
         $sql = "select * from division where divisionName = :divisionName ";
         $response = DB::select($sql, ['divisionName' => $divisionName]);
+        return $response;
+    }
+
+    public function adminGetAllDivision($departmentID) 
+    {
+        $sql = "select * from division where departmentID = :departmentID";
+        $response = DB::select($sql, ['departmentID' => $departmentID]);
         return $response;
     }
 

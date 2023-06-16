@@ -41,7 +41,7 @@ class User extends Controller
         $res = $this->empty_check(['divisionID'], $request);
         if ($res['status'])
             return response($res['message'], 400);
-        
+
         $divisionID = $request->input("divisionID");
         $response['result'] = $this->shiftmodel->getShift($divisionID);
         if (count($response['result']) != 0) {
@@ -118,11 +118,13 @@ class User extends Controller
 
         if (empty($name) && empty($phoneNumber))
             return response('無更新內容', 400);
+        if ($user[0]->name == $name && $user[0]->phoneNumber == $phoneNumber)
+            return response('無更新內容', 400);
 
         if (empty($name))
-            $name = NAN;
+            $name = $user[0]->name;
         if (empty($phoneNumber))
-            $phoneNumber = NAN;
+            $phoneNumber = $user[0]->phoneNumber;
 
         $response['result'] = $this->usermodel->userUpdateUser($id, $name, $phoneNumber);
 

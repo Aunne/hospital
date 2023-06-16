@@ -18,4 +18,11 @@ class Doctor
         $response = DB::select($sql, ['doctorIDNumber' => $doctorIDNumber]);
         return $response;
     }
+
+    public function adminGetAllDoctor()
+    {
+        $sql = "select * from doctor";
+        $response = DB::select($sql);
+        return $response;
+    }
 }

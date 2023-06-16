@@ -23,13 +23,26 @@ class User
         return $response;
     }
 
+    public function staffGetUserAccount($account)
+    {
+        $sql = "
+        select * 
+        from user, userinfo
+        where user.id = userinfo.userID
+        AND user.account like CONCAT(:account, '%')
+        Limit 10";
+        
+        $response = DB::select($sql, ['account' => $account]);
+        return $response;
+    }
+
     public function getAllDivision()
     {
         $sql = "
         select * 
         from division, department
         where division.departmentID = department.departmentID";
-        
+
         $response = DB::select($sql);
         return $response;
     }
@@ -58,11 +71,11 @@ class User
     public function userUpdateUser($id, $name, $phoneNumber)
     {
         $sql = "update userinfo ";
-        if ($name != NAN) 
+        if ($name != NAN)
             $sql .= "set userinfo.name = :name ";
-        if ($phoneNumber != NAN) 
+        if ($phoneNumber != NAN)
             $sql .= ", userinfo.phoneNumber =:phoneNumber ";
-        
+
         $sql .= "where userinfo.userID = :id";
         $response = DB::update($sql, ['id' => $id, 'name' => $name, 'phoneNumber' => $phoneNumber]);
 

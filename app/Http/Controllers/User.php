@@ -233,6 +233,10 @@ class User extends Controller
         if ($this->check_appointment($appointment, $userID))
             return response("重複的掛號", 400);
 
+        $divisionID = $appointment[0]->divisionID;
+        if (count($this->appointmentmodel->getUserAppointDivision($userID, $divisionID, $shift[0]->date)) > 1)
+            return response("科別重複掛號", 400);
+
         $appointmentNumberArr = $this->convert_array($appointment, 'appointmentNumber');
         if (count($appointmentNumberArr) == 0)
             $appointmentNumber = 1;

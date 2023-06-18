@@ -209,6 +209,11 @@ class Staff extends Controller
         if (count($appointment) >= 50)
             return response("額滿不可掛號", 202);
 
+        $divisionID = $appointment[0]->divisionID;
+        $userID = $user[0]->id;
+        if (count($this->appointmentmodel->getUserAppointDivision($userID, $divisionID, $shift[0]->date)) > 1)
+            return response("科別重複掛號", 400);
+
         $userID = $user[0]->id;
         if ($this->check_appointment($appointment, $userID))
             return response("重複的掛號", 400);

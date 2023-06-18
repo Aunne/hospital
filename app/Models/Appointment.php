@@ -46,6 +46,20 @@ class Appointment
         return $response;
     }
 
+    public function getUserAppointDivision($userID , $divisionID, $date){
+        $sql = "
+        select * 
+        from appointment, shift
+        where userID = :userID 
+        AND appointment.shiftID = shift.shiftID
+        AND shift.divisionID = :divisionID
+        AND shift.date = :date
+        AND appointment.isCancel = 'false'";
+        $response = DB::select($sql, ['userID' => $userID, 'divisionID' => $divisionID, 'date' => $date]);
+        return $response;
+    }
+        
+
     public function getAppointmentShiftID($shiftID)
     {
         $sql = "

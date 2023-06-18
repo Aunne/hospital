@@ -39,7 +39,7 @@ class Staff extends Controller
         if ($password == $res[0]->password) {
             $id = $res[0]->id;
             $token = $this->genToken($id, $account);
-            return response($token, 200);
+            return response(json_encode($token), 200);
         } else {
             return response('密碼錯誤', 400);
         }

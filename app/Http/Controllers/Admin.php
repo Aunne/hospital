@@ -213,7 +213,7 @@ class Admin extends Controller
 
         $division = $this->adminmodel->getDivisionDepartmentID($departmentID);
         if (count($division) != 0)
-            return response("此科別仍有小科別", 400);
+            return response("此科別仍有小科別", 202);
         
         $res = $this->departmentmodel->deleteDepartment($departmentID);
         if ($res == 0)
@@ -237,11 +237,11 @@ class Admin extends Controller
 
         $shift = $this->shiftmodel->getShiftDivisionID($divisionID);
         if (count($shift) != 0)
-            return response("此小科別仍有班表", 400);
+            return response("此小科別仍有班表", 202);
         
         $appointment = $this->appointmentmodel->getAppointmentDivisionID($divisionID);
         if (count($appointment) != 0)
-            return response("此小科別仍有預約", 400);
+            return response("此小科別仍有預約", 202);
         
         $res = $this->shiftmodel->deleteDivision($divisionID);
         if ($res == 0)
@@ -287,7 +287,7 @@ class Admin extends Controller
         
         $appointment = $this->appointmentmodel->getAppointmentShiftID($shiftID);
         if (count($appointment) != 0)
-            return response("此班表仍有預約", 400);
+            return response("此班表仍有預約", 202);
         
         $res = $this->shiftmodel->deleteShift($shiftID);
         if ($res == 0)
@@ -369,7 +369,7 @@ class Admin extends Controller
 
         $division = $this->adminmodel->getDivisionName($divisionName);
         if (count($division) == 0)
-            return response("無此小科別", 400);
+            return response("無此小科別", 404);
 
         $divisionID = $division[0]->divisionID;
         $res = $this->shiftmodel->adminGetShiftDivisionID($divisionID);
